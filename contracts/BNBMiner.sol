@@ -22,7 +22,7 @@ contract BNBMiner {
     }
 
     function hatchEggs(address ref) public {
-        require(initialized);
+        require(initialized, "Not initialized");
         if (ref == msg.sender) {
             ref = 0;
         }
@@ -46,7 +46,7 @@ contract BNBMiner {
     }
 
     function sellEggs() public {
-        require(initialized);
+        require(initialized, "Not initialized");
         uint256 hasEggs = getMyEggs();
         uint256 eggValue = calculateEggSell(hasEggs);
         uint256 fee = devFee(eggValue);
@@ -60,7 +60,7 @@ contract BNBMiner {
     }
 
     function buyEggs(address ref) public payable {
-        require(initialized);
+        require(initialized, "Not initialized");
         uint256 eggsBought = calculateEggBuy(
             msg.value,
             address(this).balance - msg.value
@@ -107,7 +107,7 @@ contract BNBMiner {
     function seedMarket() public payable {
         require(marketEggs == 0);
         initialized = true;
-        marketEggs = 259200000000;
+        marketEggs = 2592*(10**8);
     }
 
     function getBalance() public view returns (uint256) {
