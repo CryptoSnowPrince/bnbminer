@@ -8,15 +8,15 @@ contract BNBMiner {
     uint256 PSN = 10000;
     uint256 PSNH = 5000;
     bool public initialized = false;
-    address public treasury1;
-    address public treasury2;
+    address payable public treasury1;
+    address payable public treasury2;
     mapping(address => uint256) public hatcheryMiners;
     mapping(address => uint256) public claimedEggs;
     mapping(address => uint256) public lastHatch;
     mapping(address => address) public referrals;
     uint256 public marketEggs;
 
-    constructor(address _treasury1, address _treasury2) {
+    constructor(address payable _treasury1, address payable _treasury2) {
         treasury1 = _treasury1;
         treasury2 = _treasury2;
     }
@@ -24,9 +24,12 @@ contract BNBMiner {
     function hatchEggs(address ref) public {
         require(initialized, "Not initialized");
         if (ref == msg.sender) {
-            ref = 0;
+            ref = address(0);
         }
-        if (referrals[msg.sender] == 0 && referrals[msg.sender] != msg.sender) {
+        if (
+            referrals[msg.sender] == address(0) &&
+            referrals[msg.sender] != msg.sender
+        ) {
             referrals[msg.sender] = ref;
         }
         uint256 eggsUsed = getMyEggs();
@@ -54,9 +57,15 @@ contract BNBMiner {
         claimedEggs[msg.sender] = 0;
         lastHatch[msg.sender] = block.timestamp;
         marketEggs = marketEggs + hasEggs;
-        treasury1.transfer(halfFee);
-        treasury2.transfer(fee - halfFee);
-        msg.sender.transfer(eggValue - fee);
+
+        (bool sent1, ) = treasury1.call{value: halfFee}("");
+        require(sent1, "ETH transfer Fail");
+
+        (bool sent2, ) = treasury2.call{value: fee - halfFee}("");
+        require(sent2, "ETH transfer Fail");
+
+        (bool sent, ) = msg.sender.call{value: eggValue - fee}("");
+        require(sent, "ETH transfer Fail");
     }
 
     function buyEggs(address ref) public payable {
@@ -69,8 +78,13 @@ contract BNBMiner {
         uint256 fee = devFee(msg.value);
         uint256 halfFee = fee / 2;
         claimedEggs[msg.sender] = claimedEggs[msg.sender] + eggsBought;
-        treasury1.transfer(halfFee);
-        treasury2.transfer(fee - halfFee);
+
+        (bool sent1, ) = treasury1.call{value: halfFee}("");
+        require(sent1, "ETH transfer Fail");
+
+        (bool sent2, ) = treasury2.call{value: fee - halfFee}("");
+        require(sent2, "ETH transfer Fail");
+
         hatchEggs(ref);
     }
 
