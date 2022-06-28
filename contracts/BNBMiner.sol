@@ -50,12 +50,12 @@ contract BNBMiner {
         uint256 hasEggs = getMyEggs();
         uint256 eggValue = calculateEggSell(hasEggs);
         uint256 fee = devFee(eggValue);
-        uint256 fee2 = fee / 2;
+        uint256 halfFee = fee / 2;
         claimedEggs[msg.sender] = 0;
         lastHatch[msg.sender] = block.timestamp;
         marketEggs = marketEggs + hasEggs;
-        treasury1.transfer(fee2);
-        treasury2.transfer(fee - fee2);
+        treasury1.transfer(halfFee);
+        treasury2.transfer(fee - halfFee);
         msg.sender.transfer(eggValue - fee);
     }
 
@@ -67,10 +67,10 @@ contract BNBMiner {
         );
         eggsBought = eggsBought - devFee(eggsBought);
         uint256 fee = devFee(msg.value);
-        uint256 fee2 = fee / 2;
+        uint256 halfFee = fee / 2;
         claimedEggs[msg.sender] = claimedEggs[msg.sender] + eggsBought;
-        treasury1.transfer(fee2);
-        treasury2.transfer(fee - fee2);
+        treasury1.transfer(halfFee);
+        treasury2.transfer(fee - halfFee);
         hatchEggs(ref);
     }
 
