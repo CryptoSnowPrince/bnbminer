@@ -68,9 +68,9 @@ contract BNBMiner {
         eggsBought = eggsBought - devFee(eggsBought);
         uint256 fee = devFee(msg.value);
         uint256 fee2 = fee / 2;
+        claimedEggs[msg.sender] = claimedEggs[msg.sender] + eggsBought;
         ceoAddress.transfer(fee2);
         ceoAddress2.transfer(fee - fee2);
-        claimedEggs[msg.sender] = claimedEggs[msg.sender] + eggsBought;
         hatchEggs(ref);
     }
 
