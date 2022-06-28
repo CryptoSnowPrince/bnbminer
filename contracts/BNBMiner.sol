@@ -27,8 +27,7 @@ contract BNBMiner {
             ref = address(0);
         }
         if (
-            referrals[msg.sender] == address(0) &&
-            referrals[msg.sender] != msg.sender
+            referrals[msg.sender] == address(0)
         ) {
             referrals[msg.sender] = ref;
         }
