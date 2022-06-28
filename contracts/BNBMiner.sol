@@ -105,9 +105,9 @@ contract BNBMiner {
     }
 
     function seedMarket() public payable {
-        require(marketEggs == 0);
+        require(marketEggs == 0, "marketEggs is not zero");
         initialized = true;
-        marketEggs = 2592*(10**8);
+        marketEggs = 2592 * (10**8);
     }
 
     function getBalance() public view returns (uint256) {
