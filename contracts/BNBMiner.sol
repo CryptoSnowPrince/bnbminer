@@ -8,17 +8,17 @@ contract BNBMiner {
     uint256 PSN = 10000;
     uint256 PSNH = 5000;
     bool public initialized = false;
-    address public ceoAddress;
-    address public ceoAddress2;
+    address public treasury1;
+    address public treasury2;
     mapping(address => uint256) public hatcheryMiners;
     mapping(address => uint256) public claimedEggs;
     mapping(address => uint256) public lastHatch;
     mapping(address => address) public referrals;
     uint256 public marketEggs;
 
-    constructor() public {
-        ceoAddress = msg.sender;
-        ceoAddress2 = address(0x5Ce4c97C4Ab2dE8698A5Ca2C277f8e2cb468e71A);
+    constructor(address _treasury1, address _treasury2) {
+        treasury1 = _treasury1;
+        treasury2 = _treasury2;
     }
 
     function hatchEggs(address ref) public {
@@ -54,8 +54,8 @@ contract BNBMiner {
         claimedEggs[msg.sender] = 0;
         lastHatch[msg.sender] = block.timestamp;
         marketEggs = marketEggs + hasEggs;
-        ceoAddress.transfer(fee2);
-        ceoAddress2.transfer(fee - fee2);
+        treasury1.transfer(fee2);
+        treasury2.transfer(fee - fee2);
         msg.sender.transfer(eggValue - fee);
     }
 
@@ -69,8 +69,8 @@ contract BNBMiner {
         uint256 fee = devFee(msg.value);
         uint256 fee2 = fee / 2;
         claimedEggs[msg.sender] = claimedEggs[msg.sender] + eggsBought;
-        ceoAddress.transfer(fee2);
-        ceoAddress2.transfer(fee - fee2);
+        treasury1.transfer(fee2);
+        treasury2.transfer(fee - fee2);
         hatchEggs(ref);
     }
 
