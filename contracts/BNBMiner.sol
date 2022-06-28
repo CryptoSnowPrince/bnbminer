@@ -80,7 +80,6 @@ contract BNBMiner {
         uint256 rs,
         uint256 bs
     ) public view returns (uint256) {
-        //(PSN*bs)/(PSNH+((PSN*rs+PSNH*rt)/rt));
         return (PSN * bs) / (PSNH + (PSN * rs + PSNH * rt) / rt);
     }
 
