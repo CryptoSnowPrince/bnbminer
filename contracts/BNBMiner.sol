@@ -28,16 +28,16 @@ contract BNBMiner{
             referrals[msg.sender]=ref;
         }
         uint256 eggsUsed=getMyEggs();
-        uint256 newMiners=SafeMath.div(eggsUsed,EGGS_TO_HATCH_1MINERS);
-        hatcheryMiners[msg.sender]=SafeMath.add(hatcheryMiners[msg.sender],newMiners);
+        uint256 newMiners=eggsUsed/EGGS_TO_HATCH_1MINERS;
+        hatcheryMiners[msg.sender]=hatcheryMiners[msg.sender]+newMiners;
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
         
         //send referral eggs
-        claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,10));
+        claimedEggs[referrals[msg.sender]]=claimedEggs[referrals[msg.sender]]+eggsUsed/10;
         
         //boost market to nerf miners hoarding
-        marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,5));
+        marketEggs=marketEggs+eggsUsed/5;
     }
     function sellEggs() public{
         require(initialized);
@@ -47,26 +47,26 @@ contract BNBMiner{
         uint256 fee2=fee/2;
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        marketEggs=SafeMath.add(marketEggs,hasEggs);
+        marketEggs=marketEggs+hasEggs;
         ceoAddress.transfer(fee2);
         ceoAddress2.transfer(fee-fee2);
-        msg.sender.transfer(SafeMath.sub(eggValue,fee));
+        msg.sender.transfer(eggValue-fee);
     }
     function buyEggs(address ref) public payable{
         require(initialized);
-        uint256 eggsBought=calculateEggBuy(msg.value,SafeMath.sub(address(this).balance,msg.value));
-        eggsBought=SafeMath.sub(eggsBought,devFee(eggsBought));
+        uint256 eggsBought=calculateEggBuy(msg.value,address(this).balance-msg.value);
+        eggsBought=eggsBought-devFee(eggsBought);
         uint256 fee=devFee(msg.value);
         uint256 fee2=fee/2;
         ceoAddress.transfer(fee2);
         ceoAddress2.transfer(fee-fee2);
-        claimedEggs[msg.sender]=SafeMath.add(claimedEggs[msg.sender],eggsBought);
+        claimedEggs[msg.sender]=claimedEggs[msg.sender]+eggsBought;
         hatchEggs(ref);
     }
     //magic trade balancing algorithm
     function calculateTrade(uint256 rt,uint256 rs, uint256 bs) public view returns(uint256){
         //(PSN*bs)/(PSNH+((PSN*rs+PSNH*rt)/rt));
-        return SafeMath.div(SafeMath.mul(PSN,bs),SafeMath.add(PSNH,SafeMath.div(SafeMath.add(SafeMath.mul(PSN,rs),SafeMath.mul(PSNH,rt)),rt)));
+        return (PSN*bs)/(PSNH+(PSN*rs+PSNH*rt)/rt);
     }
     function calculateEggSell(uint256 eggs) public view returns(uint256){
         return calculateTrade(eggs,marketEggs,address(this).balance);
@@ -78,7 +78,7 @@ contract BNBMiner{
         return calculateEggBuy(eth,address(this).balance);
     }
     function devFee(uint256 amount) public pure returns(uint256){
-        return SafeMath.div(SafeMath.mul(amount,5),100);
+        return amount*5/100;
     }
     function seedMarket() public payable{
         require(marketEggs==0);
@@ -92,11 +92,11 @@ contract BNBMiner{
         return hatcheryMiners[msg.sender];
     }
     function getMyEggs() public view returns(uint256){
-        return SafeMath.add(claimedEggs[msg.sender],getEggsSinceLastHatch(msg.sender));
+        return claimedEggs[msg.sender]+getEggsSinceLastHatch(msg.sender);
     }
     function getEggsSinceLastHatch(address adr) public view returns(uint256){
-        uint256 secondsPassed=min(EGGS_TO_HATCH_1MINERS,SafeMath.sub(now,lastHatch[adr]));
-        return SafeMath.mul(secondsPassed,hatcheryMiners[adr]);
+        uint256 secondsPassed=min(EGGS_TO_HATCH_1MINERS,block.timestamp-lastHatch[adr]);
+        return secondsPassed*hatcheryMiners[adr];
     }
     function min(uint256 a, uint256 b) private pure returns (uint256) {
         return a < b ? a : b;
