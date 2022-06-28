@@ -33,7 +33,7 @@ contract BNBMiner {
         uint256 newMiners = eggsUsed / EGGS_TO_HATCH_1MINERS;
         hatcheryMiners[msg.sender] = hatcheryMiners[msg.sender] + newMiners;
         claimedEggs[msg.sender] = 0;
-        lastHatch[msg.sender] = now;
+        lastHatch[msg.sender] = block.timestamp;
 
         //send referral eggs
         claimedEggs[referrals[msg.sender]] =
@@ -52,7 +52,7 @@ contract BNBMiner {
         uint256 fee = devFee(eggValue);
         uint256 fee2 = fee / 2;
         claimedEggs[msg.sender] = 0;
-        lastHatch[msg.sender] = now;
+        lastHatch[msg.sender] = block.timestamp;
         marketEggs = marketEggs + hasEggs;
         ceoAddress.transfer(fee2);
         ceoAddress2.transfer(fee - fee2);
