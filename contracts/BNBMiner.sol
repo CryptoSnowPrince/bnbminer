@@ -26,9 +26,7 @@ contract BNBMiner {
         if (ref == msg.sender) {
             ref = address(0);
         }
-        if (
-            referrals[msg.sender] == address(0)
-        ) {
+        if (referrals[msg.sender] == address(0)) {
             referrals[msg.sender] = ref;
         }
         uint256 eggsUsed = getMyEggs();
