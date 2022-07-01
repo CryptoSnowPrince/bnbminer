@@ -47,7 +47,7 @@ contract BNBMiner {
 
     function sellEggs() external {
         require(initialized, "Not initialized");
-        uint256 hasEggs = getMyEggs();
+        uint256 hasEggs = getMyEggs(msg.sender);
         uint256 eggValue = calculateEggSell(hasEggs);
         uint256 fee = devFee(eggValue);
         uint256 halfFee = fee / 2;
