@@ -29,7 +29,7 @@ contract BNBMiner {
         if (referrals[msg.sender] == address(0)) {
             referrals[msg.sender] = ref;
         }
-        uint256 eggsUsed = getMyEggs();
+        uint256 eggsUsed = getMyEggs(msg.sender);
         uint256 newMiners = eggsUsed / EGGS_TO_HATCH_1MINERS;
         hatcheryMiners[msg.sender] = hatcheryMiners[msg.sender] + newMiners;
         claimedEggs[msg.sender] = 0;
@@ -124,12 +124,12 @@ contract BNBMiner {
         return address(this).balance;
     }
 
-    function getMyMiners() external view returns (uint256) {
-        return hatcheryMiners[msg.sender];
+    function getMyMiners(address account) external view returns (uint256) {
+        return hatcheryMiners[account];
     }
 
-    function getMyEggs() public view returns (uint256) {
-        return claimedEggs[msg.sender] + getEggsSinceLastHatch(msg.sender);
+    function getMyEggs(address account) public view returns (uint256) {
+        return claimedEggs[account] + getEggsSinceLastHatch(account);
     }
 
     function getEggsSinceLastHatch(address adr) public view returns (uint256) {
