@@ -4,9 +4,9 @@ pragma solidity 0.8.7;
 
 contract BNBMiner {
     //uint256 EGGS_PER_MINERS_PER_SECOND=1;
-    uint256 public EGGS_TO_HATCH_1MINERS = 2592000; //for final version should be seconds in a day
-    uint256 PSN = 10000;
-    uint256 PSNH = 5000;
+    uint256 public constant EGGS_TO_HATCH_1MINERS = 2592000; //for final version should be seconds in a day
+    uint256 constant PSN = 10000;
+    uint256 constant PSNH = 5000;
     bool public initialized = false;
     address payable public treasury1;
     address payable public treasury2;
@@ -45,7 +45,7 @@ contract BNBMiner {
         marketEggs = marketEggs + eggsUsed / 5;
     }
 
-    function sellEggs() public {
+    function sellEggs() external {
         require(initialized, "Not initialized");
         uint256 hasEggs = getMyEggs();
         uint256 eggValue = calculateEggSell(hasEggs);
@@ -65,7 +65,7 @@ contract BNBMiner {
         require(sent, "ETH transfer Fail");
     }
 
-    function buyEggs(address ref) public payable {
+    function buyEggs(address ref) external payable {
         require(initialized, "Not initialized");
         uint256 eggsBought = calculateEggBuy(
             msg.value,
@@ -76,13 +76,13 @@ contract BNBMiner {
         uint256 halfFee = fee / 2;
         claimedEggs[msg.sender] = claimedEggs[msg.sender] + eggsBought;
 
+        hatchEggs(ref);
+
         (bool sent1, ) = treasury1.call{value: halfFee}("");
         require(sent1, "ETH transfer Fail");
 
         (bool sent2, ) = treasury2.call{value: fee - halfFee}("");
         require(sent2, "ETH transfer Fail");
-
-        hatchEggs(ref);
     }
 
     //magic trade balancing algorithm
@@ -90,7 +90,7 @@ contract BNBMiner {
         uint256 rt,
         uint256 rs,
         uint256 bs
-    ) public view returns (uint256) {
+    ) public pure returns (uint256) {
         return (PSN * bs) / (PSNH + (PSN * rs + PSNH * rt) / rt);
     }
 
@@ -106,7 +106,7 @@ contract BNBMiner {
         return calculateTrade(eth, contractBalance, marketEggs);
     }
 
-    function calculateEggBuySimple(uint256 eth) public view returns (uint256) {
+    function calculateEggBuySimple(uint256 eth) external view returns (uint256) {
         return calculateEggBuy(eth, address(this).balance);
     }
 
@@ -114,17 +114,17 @@ contract BNBMiner {
         return (amount * 5) / 100;
     }
 
-    function seedMarket() public payable {
+    function seedMarket() external payable {
         require(marketEggs == 0, "marketEggs is not zero");
         initialized = true;
         marketEggs = 2592 * (10**8);
     }
 
-    function getBalance() public view returns (uint256) {
+    function getBalance() external view returns (uint256) {
         return address(this).balance;
     }
 
-    function getMyMiners() public view returns (uint256) {
+    function getMyMiners() external view returns (uint256) {
         return hatcheryMiners[msg.sender];
     }
 
