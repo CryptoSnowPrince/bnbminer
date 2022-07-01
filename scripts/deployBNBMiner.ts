@@ -15,7 +15,7 @@ async function main() {
 
   // We get the contract to deploy
   
-  const _treasury1 = ""; // deployer can set this address
+  const _treasury1 = "0x5Ce4c97C4Ab2dE8698A5Ca2C277f8e2cb468e71A"; // deployer can set this address
   const _treasury2 = "0x5Ce4c97C4Ab2dE8698A5Ca2C277f8e2cb468e71A";
 
   const BNBMiner = await ethers.getContractFactory("BNBMiner");
